@@ -1,0 +1,33 @@
+# See docs/SPECIFICATION.md for paper vs inherited vs unresolved settings.
+seed: 42
+device: cuda
+data_dir: data/MGTAB
+cache_dir: data/processed
+output_dir: outputs/mgtab
+split: [0.8, 0.1, 0.1]
+expected_nodes: 10199
+expected_input_dim: 788
+epochs: 200
+lr: 0.01
+optimizer: Adam
+weight_decay: 0.0
+patience: 50
+selection: val_loss
+dropout: 0.3
+heads: 4
+classifier_hidden: 32
+lambda_ncl: 0.1
+lambda_scl: 0.1
+temperature: 0.1
+contrastive_chunk: 256
+attention_query_chunk: 256
+tree_depth: 4
+subgraph_batch: 256
+edge_drop: 0.3
+tree_neighbor_cap: 10
+motif_backend: orca
+orca_executable: tools/orca.exe
+# All topology statistics are exact. ORCA is strongly recommended on MGTAB.
+pagerank_alpha: 0.85
+topology_backend: igraph
+frequency_source: edge_occurrences

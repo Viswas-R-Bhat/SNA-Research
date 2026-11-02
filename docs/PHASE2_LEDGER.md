@@ -1,0 +1,48 @@
+# Additions beyond RP1: Phase 2 ledger
+
+Requested by the user on 6 October 2026: record **anything beyond the official paper**, including practical engineering additions. This ledger does not claim that any item improves detection accuracy. Phase 2 should measure effects under the same data/split/selection procedure before making improvement claims.
+
+The implementation's verified paper content is mapped separately in [SPECIFICATION.md](SPECIFICATION.md). Entries below are additions, choices or departures beyond that published specification, including inherited settings the MLS paper does not explicitly state. The source project currently includes these items, so the current runnable baseline must be described as an audited reimplementation with disclosed choices, not an exact official release.
+
+## Modeling and data choices to reconcile before exact Phase 1 claims
+
+| ID | Item beyond explicit RP1 detail | Current behavior / location | Possible effect | Phase 2 or reconciliation action |
+|---|---|---|---|---|
+| D01 | Frequency fallback for the standardized dataset | `frequency_source: edge_occurrences`; every original edge record contributes unit frequency. Optional aligned `interaction_frequency.pt`. PMI weights are excluded from counts. | **Changes dyadic values if real repeated-event counts differ.** RP1 Eq.7 asks for frequency; raw counts are absent from standard tensors. | Obtain authors' preprocessing/raw counts; compare observed occurrence fallback with authoritative counts. Treat fallback as a limitation, not verified reproduction. |
+| D02 | Topology projection convention | Undirected simple union of seven types for MLS topology; self-loops removed; original directed edges retained for intimacy/reciprocity. | Motif, ego and centrality values depend on projection. | Confirm original graph projection; retain alternative projections as explicit Phase 2 experiments only. |
+| D03 | Induced graphlets and orbit aggregation | Eight connected induced graphlets; ORCA per-user orbit sums. | Induced/non-induced counting can differ substantially. | Confirm the authors' convention; compare definitions only in separately labeled runs. |
+| D04 | Quantile/tie/reciprocity conventions | Positive ordered-pair intimacy population; ties enter lower bin; reciprocity interior quantiles exclude 0/1; unilateral pair counted for both users. | Feature distributions can differ from author implementation. | Obtain precise population/bucket definitions; freeze before benchmarking. |
+| D05 | Local and global statistic conventions | Center constraint on 2-hop ego; ACC includes zero-degree clustering; undirected unnormalized BC, PageRank .85, L2 eigenvector, reachable-node closeness; isolate undefined values zero. | Values/normalization may differ. | Verify conventions; separately report alternatives in Phase 2. |
+| D06 | Seed and rounding | Seed 42, non-stratified RandomState permutation, floor 80% / 90% cutoffs. | Split identity affects scores. | Save actual IDs; confirm author indices/seed; use additional seeds only as later robustness work. |
+| M01 | Attention head count/tokenization | Four heads; H-GNN attention across all users; A-Fusion attention across four 16D level tokens per user. | Head count and fusion token layout affect learned representations. | Reconcile author architecture; freeze baseline before tuning. |
+| M02 | MLP depth and hidden sizes | Each structural subcategory uses Linear+LeakyReLU; two subcategories get 8D each; classifier hidden width 32. | Affects capacity/optimization. | Confirm author code; keep depth/width sweeps for Phase 2. |
+| M03 | Unpublished regularization and inherited SeBot settings | Dropout .3, temperature .1, tree depth 4, two global blocks, three subgraph GCNs, upstream cap 10 and isolated-user random stars. | Training/trees differ if MLS authors changed SeBot settings. | Trace to original SeBot source; verify MLS settings before attributing benefits. |
+| M04 | Loss reduction and optimizer details | Mean classification CE; Adam lr .01 with no weight decay/scheduler; validation-loss selection and patience 50. | Loss scale/model selection can affect results. | Confirm author criterion, patience and reduction; do not call a tuned setting the original baseline. |
+| M05 | Disconnected-tree handling | Upstream connected-component wrapper, singleton chains, merged root. | Can affect structure on disconnected/isolated users. | Compare to author tree caches; retain the wrapper's provenance. |
+| M06 | Reproducible noisy FACN evaluation | Original FACN samples noise during evaluation; fixed eval seed is added. | Changes repeatability and which validation realization is compared. | Record seed/protocol; compare repeated noisy evaluations if needed. |
+
+## Execution improvements and engineering additions already included
+
+| ID | Addition | Behavior / files | Expected effect and validation |
+|---|---|---|---|
+| E01 | Modern Windows-compatible environment | Python 3.12, PyTorch 2.5.1 CUDA 12.1, PyG 2.6.1 instead of RP1's older runtime | Numerical/kernel differences possible; enables the user's machine. Versions recorded per run. |
+| E02 | Exact C++ graphlet backend | Separate ORCA executable/source; `motif_backend: orca` | Faster exact induced counts; tested against independent exhaustive subsets. No sampled graphlets. |
+| E03 | Compiled exact topology backend | igraph for ego/global measures; NetworkX reference retained | Faster CPU computation; compared on connected/random/isolate fixtures. Eigenvector ambiguity in tied disconnected components disclosed. |
+| E04 | Query-chunked full-node attention | `attention_query_chunk`; checkpointed query blocks; all users remain keys/values | Lower peak memory. Values/gradients compared against full attention at dropout zero. Dropout random masks are sampled in chunks. |
+| E05 | Exact chunked contrastive loss | `contrastive_chunk`; stable logsumexp and activation recomputation | Lower memory/numerical overflow risk. Includes identical positives and all negatives; loss/gradient tests against dense NT-Xent. |
+| E06 | Subgraph activation recomputation | `subgraph_batch`; upstream SEP_G on smaller execution groups; checkpointing | Lower GPU activation memory; same per-user graph/tree inputs. No MLS sampling cap introduced. |
+| E07 | Removable torch_sparse dependency | Compatibility copies use original COO message() path; unused fused sparse path removed | Easier Windows setup; pooling/GCN/FACN equations retained. Upstream source preserved for review. |
+| E08 | Resumable preparation | Hashed stage directories; completed motifs/global features/global tree reused; ego rows/subgraph trees saved periodically | Survives interrupted sessions. Global tree optimization itself restarts if interrupted before its cache is complete. |
+| E09 | Atomic best/latest checkpoints and resume | `best.pt`, `latest.pt`, optimizer and Torch RNG states; `train --resume` | Survives cloud/laptop interruptions. Validation alone chooses best. Hardware/kernel differences can still affect resumed arithmetic. |
+| E10 | Leakage/data integrity checks | Shape/label validation, SHA-256 inputs, train-only standardization, saved split IDs, cache/checkpoint compatibility checks | Prevents accidental dataset/config mixing and label leakage. Train-only scaler is an added conservative convention not stated explicitly in RP1. |
+| E11 | Extra metrics and prediction exports | Macro F1, ROC-AUC, confusion matrix, probabilities, fusion weights alongside paper's accuracy/bot F1/precision/recall | Additional reporting; not used to select/tune the classifier. |
+| E12 | Runtime/memory reporting | `run.json`, `history.csv`, configs and test JSON | Makes the college demo/reproduction auditable. No accuracy benefit claimed. |
+| E13 | Synthetic fixtures and independent tests | Small full-pipeline fixture; graphlet, split/scaler, loss-gradient, attention-gradient, topology and dimension tests | Software verification only. Synthetic metrics never stand in for paper results. |
+| E14 | Local developer tools | CLI, environment diagnostic, PowerShell setup/build scripts, VS Code launch settings, README | Practical packaging beyond the paper. |
+| E15 | Cloud entry points | Colab and Kaggle notebooks, persistent cache/output paths, runtime checks | Optional access to more compute; same Python model/config. Hosted execution unverified until actually run in account. |
+| E16 | Distribution/provenance package | Source ZIP, upstream sources/licenses, specification/validation/platform documents | Move/review the baseline locally without redistributing the dataset. |
+| E17 | Self-contained Kaggle workflow | `kaggle_standalone.ipynb` embeds a hashed modular source snapshot, creates an isolated pinned Python 3.12 environment with uv, and provides smoke/prepare/benchmark/train/evaluate controls and restoration of saved notebook outputs. | Packaging and execution additions beyond RP1. Ten-epoch benchmarking writes a separate folder and is not a paper result. Smoke uses synthetic data. One GPU is used; no distributed training or architecture change is introduced. |
+
+## How to use this ledger in Phase 2
+
+First resolve D/M items with author code or clarification where possible. Keep a frozen baseline config, data fingerprint and split. Then evaluate each intended change in a separate config/output directory and record accuracy, bot F1/precision/recall, runtime, peak memory, seed and hardware. A useful implementation addition is not automatically a detection improvement. No new classifier, learned structural feature, augmentation strategy or external LLM branch has been introduced in this project.

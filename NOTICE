@@ -1,0 +1,18 @@
+SeBot-MLS baseline reimplementation for the SNA college project.
+This is not the official SeBot-MLS authors' release.
+
+Original SeBot code: Yingguang Yang and collaborators,
+https://github.com/846468230/SEBot
+Commit 59b5407d2d5600aee06f507c2b0d343fa599b482
+Apache License 2.0, retained at vendor/SEBot/LICENSE and src/sebot_mls/legacy/LICENSE.
+Adaptations are described in scripts/prepare_legacy.py and docs/SPECIFICATION.md.
+
+ORCA: Tomaz Hocevar and Janez Demsar,
+https://github.com/thocevar/orca
+Commit e146a8b1a99a90f5e3096b7bcc2ab0ea246c3ca7
+GPL v3 license retained at vendor/orca/LICENSE. Distributed as a separate tool
+with its corresponding source. Build command: scripts/build_orca.ps1.
+
+MGTAB is downloaded separately from its official release, not redistributed:
+https://github.com/GraphDetec/MGTAB
+Dataset license: CC BY-NC-ND 4.0.

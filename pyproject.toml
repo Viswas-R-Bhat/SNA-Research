@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sebot-mls-baseline"
+version = "0.1.0"
+description = "Paper-traceable SeBot-MLS baseline for MGTAB"
+requires-python = ">=3.10,<3.13"
+dependencies = ["torch>=2.5,<2.6", "torch-geometric==2.6.1", "numpy==1.26.4", "scipy==1.14.1", "scikit-learn==1.5.2", "networkx==3.4.2", "igraph==0.11.8", "numba==0.61.0", "PyYAML==6.0.2", "gdown==5.2.0"]
+
+[project.scripts]
+sebot-mls = "sebot_mls.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

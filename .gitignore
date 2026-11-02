@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+data/
+outputs/
+*.egg-info/
+docs/page-*.png
+docs/paper-extracted.txt
+vendor/orca/random_graphs.zip

@@ -1,0 +1,8 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {"name": "SeBot-MLS: environment check", "type": "debugpy", "request": "launch", "module": "sebot_mls.cli", "args": ["doctor"], "cwd": "${workspaceFolder}", "console": "integratedTerminal"},
+    {"name": "SeBot-MLS: train MGTAB", "type": "debugpy", "request": "launch", "module": "sebot_mls.cli", "args": ["train", "--config", "configs/mgtab.yaml"], "cwd": "${workspaceFolder}", "console": "integratedTerminal"},
+    {"name": "SeBot-MLS: evaluate MGTAB", "type": "debugpy", "request": "launch", "module": "sebot_mls.cli", "args": ["evaluate", "--config", "configs/mgtab.yaml"], "cwd": "${workspaceFolder}", "console": "integratedTerminal"}
+  ]
+}
